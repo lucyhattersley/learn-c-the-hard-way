@@ -1,1 +1,1 @@
-# learn-d-the-hard-way
+# learn-c-the-hard-way
