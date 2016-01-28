@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <string.h>
 int main(int argc, char *argv[])
 {
 	// let's make our own array of strings
@@ -11,9 +11,10 @@ int main(int argc, char *argv[])
 	int i = 0;
 	// go through each string in argv
 	// why am I skipping argv[0]?
-	for(i = 0; i < argc; i++) {
-		if(argv[1] == NULL) {
-			printf("argv is NULL\n");		
+	for(i = 1; i < argc; i++) {
+		if(strcmp(argv[i], "Florida")) {
+			printf("You must include Florida. I like Florida.\n");
+			return 0;
 		}
 		printf("arg %d: %s\n", i, argv[i]);
 	}
