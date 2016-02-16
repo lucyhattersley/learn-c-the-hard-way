@@ -14,7 +14,7 @@ int main()
 	
 	/*I'm reading the address of variable num and
 	* storing it in pointer pr2*/
-	pr2 = #
+	pr2 = &num;
 	
 	/* storing the address of pointer p2 into another pointer pr1*/
 	pr1 = &pr2;
@@ -25,7 +25,7 @@ int main()
 	printf("\n Value of num using pr1 is: %d", **pr1);
 	
 	/*Possible ways to find address of num*/
-	printf("\n Address of num is: %u", &num);
+	printf("\n Address of num is: %zd", &num);
 	printf("\n Address of num using pr2 is: %zd", pr2);
 	printf("\n Address of num using pr1 is: %zd", *pr1);
 	
