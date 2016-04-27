@@ -93,7 +93,9 @@ int main(int argc, char *argv[])
     frank->weight += 20;
     Person_print(frank);
 
-    Person_destroy(NULL);
+    // destroy them both so we clean up
+    Person_destroy(joe);
+    Person_destroy(frank);
 
     return 0;
 }
