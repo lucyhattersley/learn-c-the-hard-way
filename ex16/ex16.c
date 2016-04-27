@@ -55,7 +55,6 @@ struct Person *Person_create(char *name, int age, int height, int weight)
 void Person_destroy(struct Person *who)
 {
     assert(who != NULL);
-
     free(who->name);
     free(who);
 }
@@ -93,6 +92,8 @@ int main(int argc, char *argv[])
     frank->age +=20;
     frank->weight += 20;
     Person_print(frank);
+
+    Person_destroy(NULL);
 
     return 0;
 }
