@@ -1,26 +1,31 @@
 #include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
+#include <assert.h> // assert macro (doesn't seem to be used so far)
+#include <stdlib.h> // NULL macro
+#include <errno.h> // integer variable (errno) which indicates errors 
+#include <string.h> // strncpy function
 
+// two constants made with #define perprocessor
 #define MAX_DATA 512
 #define MAX_ROWS 100
 
+// definition of Address struct
 struct Address {
     int id;
     int set;
-    char name[MAX_DATA];
+    char name[MAX_DATA]; //name and email can both be up to 512 characters long
     char email[MAX_DATA];
 };
 
+// definition of Database struct, which contains a list of Address structs (each called Row)
 struct Database {
-    struct Address rows[MAX_ROWS];
+    struct Address rows[MAX_ROWS]; // database can have up to 100 rows (each a Address struct)
 };
 
+//NOTE: READ THIS NEXT http://www.cplusplus.com/reference/cstdio/FILE/
+// Connection struct
 struct Connection {
-    FILE *file;
-    struct Database *db;
+    FILE *file; //pointer to file object
+    struct Database *db; //pointer to Database struct
 };
 
 void die(const char *message)
