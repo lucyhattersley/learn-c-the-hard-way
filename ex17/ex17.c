@@ -1,10 +1,10 @@
-#include <stdio.h>
-#include <assert.h> // assert macro (doesn't seem to be used so far)
-#include <stdlib.h> // NULL macro
+#include <stdio.h> //Access to errno and perror in void die
+#include <assert.h> // assert macro. 
+#include <stdlib.h> // NULL macro. Access to size_t used in Dabase_load
 #include <errno.h> // integer variable (errno) which indicates errors 
 #include <string.h> // strncpy function
 
-// two constants made with #define perprocessor
+// two constants made with #define preprocessor
 #define MAX_DATA 512
 #define MAX_ROWS 100
 
@@ -21,71 +21,85 @@ struct Database {
     struct Address rows[MAX_ROWS]; // database can have up to 100 rows (each a Address struct)
 };
 
-//NOTE: READ THIS NEXT http://www.cplusplus.com/reference/cstdio/FILE/
 // Connection struct
 struct Connection {
     FILE *file; //pointer to file object
     struct Database *db; //pointer to Database struct
 };
 
-void die(const char *message)
+// die function definition. prints out error number (if errno) or prints string
+void die(const char *message) //kills the program if anything is wrong. Creates ,message string
 {
-    if(errno) {
-        perror(message);
+    if(errno) { //errno defined in #include <errno.h>. Returned by system calls 
+        perror(message); // prints the interpreted value of the error
     } else {
-        printf("ERROR: %s\n", message);
+        printf("ERROR: %s\n", message); // displays message
     }
 
     exit(1);
 }
 
-void Address_print(struct Address *addr)
+// Function definition. Takes addr as parameter (which is a Address struct type)
+void Address_print(struct Address *addr) 
 {
+    printf("Running Address_print.\n");
+    printf("Addr->id is %d\n", addr->id);
     printf("%d %s %s\n",
-        addr->id, addr->name, addr->email);
+        addr->id, addr->name, addr->email); // nested struct pointers.
 }
 
+// Function definition. Takes conn as a parameter (Connection struct type)
 void Database_load(struct Connection *conn)
 {
+    // rc is a stream of data (from database)
     int rc = fread(conn->db, sizeof(struct Database), 1, conn->file);
-    if(rc != 1) die("Failed to load database.");
+    if(rc != 1) die("Failed to load database."); // Runs die if rc not present
 }
 
+// Requests large amount of memory from heap
+// Hard to understand this struct but it's apparantly explained later in the course
+// Seems to create a Database_open struct which is of a type Connection
 struct Connection *Database_open(const char *filename, char mode)
 {
+    // pointer to conn which is allocated size of Connection struct 
+    // Connection struct is the file and db (pointer to database)
+    // Struct nested within itself?
     struct Connection *conn = malloc(sizeof(struct Connection));
-    if(!conn) die("Memory error");
+    if(!conn) die("Memory error"); // dies if not enoug memory
 
-    conn->db = malloc(sizeof(struct Database));
-    if(!conn->db) die("Memory error");
+    conn->db = malloc(sizeof(struct Database)); //nested struct pointer to database
+    if(!conn->db) die("Memory error"); // Another memory error. 
 
     if(mode == 'c') {
-        conn->file = fopen(filename, "w");
+        conn->file = fopen(filename, "w"); // write mode (wipes file)
     } else {
-        conn->file = fopen(filename, "r+");
+        conn->file = fopen(filename, "r+"); // read and write
 
         if(conn->file) {
-            Database_load(conn);
+            Database_load(conn); // loads database
         }
     }
 
-    if(!conn->file) die("Failed to open the file");
+    if(!conn->file) die("Failed to open the file"); // dies if file not loaded
 
     return conn;
 }
 
+// Function definition to close database
+// Accepts Connection struct (as conn)
 void Database_close(struct Connection *conn)
 {
     if(conn) {
-        if(conn->file) fclose(conn->file);
-        if(conn->db) free(conn->db);
-        free(conn);
+        if(conn->file) fclose(conn->file); // checks if file exists before closing
+        if(conn->db) free(conn->db); // checks if database exists before closing
+        free(conn); // frees up the memory allocated by malloc
     }
 }
 
+// Function definition. Accepts Connection struct (as conn)
 void Database_write(struct Connection *conn)
 {
-    rewind(conn->file);
+    rewind(conn->file); // sets file position to beginning of stream
 
     int rc = fwrite(conn->db, sizeof(struct Database), 1, conn->file);
     if(rc !=1) die("Failed to write database.");
@@ -108,6 +122,8 @@ void Database_create(struct Connection *conn)
 
 void Database_set(struct Connection *conn, int id, const char *name, const char *email)
 {
+    printf("Running Database_set\n");
+    printf("ID is: %d\n",id);
     struct Address *addr = &conn->db->rows[id];
     if(addr->set) die("Already set, delete it first");
 
@@ -123,6 +139,8 @@ void Database_set(struct Connection *conn, int id, const char *name, const char 
 
 void Database_get(struct Connection *conn, int id)
 {
+    printf("Running Database_get.\n");
+    printf("(ID is: %d.\n", id);
     struct Address *addr = &conn->db->rows[id];
 
     if(addr->set) {
@@ -140,14 +158,17 @@ void Database_delete(struct Connection *conn, int id)
 
 void Database_list(struct Connection *conn)
 {
+    printf("Running Database_list.\n");
+
     int i = 0;
     struct Database *db = conn->db;
 
     for(i = 0; i < MAX_ROWS; i++) {
+        printf("Running for loop: i = %d.\n",i);
         struct Address *cur = &db->rows[i];
 
         if(cur->set) {
-            Address_print(cur);
+            Address_print(cur); // cur is a struct
         }
     }
 }
@@ -177,7 +198,11 @@ int main(int argc, char *argv[])
             break;
 
         case 's':
+            printf("Running case s\n");
+
             if(argc != 6) die("Need id, name, email to set");
+
+            printf("ID is: %d\n",id);
 
             Database_set(conn, id, argv[4], argv[5]);
             Database_write(conn);
