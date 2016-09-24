@@ -42,8 +42,6 @@ void die(const char *message) //kills the program if anything is wrong. Creates 
 // Function definition. Takes addr as parameter (which is a Address struct type)
 void Address_print(struct Address *addr) 
 {
-    printf("Running Address_print.\n");
-    printf("Addr->id is %d\n", addr->id);
     printf("%d %s %s\n",
         addr->id, addr->name, addr->email); // nested struct pointers.
 }
@@ -122,12 +120,10 @@ void Database_create(struct Connection *conn)
 
 void Database_set(struct Connection *conn, int id, const char *name, const char *email)
 {
-    printf("Running Database_set\n");
-    printf("ID is: %d\n",id);
     struct Address *addr = &conn->db->rows[id];
-    if(addr->set) die("Already set, delete it first");
+    if(addr->set) die("Already set, delete it first"); // Checks if record already exists at that ID
 
-    addr->set = 1;
+    addr->set = 1; // Sets that ID point to 1
     // WARNING: bug, read the "How To Break It" and fix this
     char *res = strncpy(addr->name, name, MAX_DATA);
     // demonstrate the strncpy bug
@@ -135,13 +131,14 @@ void Database_set(struct Connection *conn, int id, const char *name, const char 
 
     res = strncpy(addr->email, email, MAX_DATA);
     if(!res) die("Email copy failed");
+
+    addr->id = id; // Added to fix ID bug
 }
 
 void Database_get(struct Connection *conn, int id)
 {
-    printf("Running Database_get.\n");
-    printf("(ID is: %d.\n", id);
     struct Address *addr = &conn->db->rows[id];
+
 
     if(addr->set) {
         Address_print(addr);
@@ -158,17 +155,15 @@ void Database_delete(struct Connection *conn, int id)
 
 void Database_list(struct Connection *conn)
 {
-    printf("Running Database_list.\n");
-
     int i = 0;
     struct Database *db = conn->db;
 
     for(i = 0; i < MAX_ROWS; i++) {
-        printf("Running for loop: i = %d.\n",i);
         struct Address *cur = &db->rows[i];
 
         if(cur->set) {
-            Address_print(cur); // cur is a struct
+            Address_print(cur);
+
         }
     }
 }
