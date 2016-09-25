@@ -112,7 +112,7 @@ void Database_create(struct Connection *conn)
 
     for(i = 0; i < MAX_ROWS; i++) {
         // make a prototype to initialize it
-        struct Address addr = {.id = 1, .set = 0};
+        struct Address addr = {.id = i, .set = 0};
         // then just assign it
         conn->db->rows[i] = addr;
     }
@@ -132,7 +132,6 @@ void Database_set(struct Connection *conn, int id, const char *name, const char 
     res = strncpy(addr->email, email, MAX_DATA);
     if(!res) die("Email copy failed");
 
-    addr->id = id; // Added to fix ID bug
 }
 
 void Database_get(struct Connection *conn, int id)
@@ -170,6 +169,7 @@ void Database_list(struct Connection *conn)
 
 int main(int argc, char *argv[])
 {
+	printf("Starting");
     if(argc < 3) die("USAGE: ex17 <dbfile> <action [action params]>");
 
     char *filename = argv[1];
